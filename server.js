@@ -22,17 +22,18 @@ const db = admin.firestore();
 // EXPRESS SETUP
 // ===============================
 const app = express();
-const corsOptions = {
-  methods: ['POST'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-};
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 // ===============================
-// TEXTBEE CONFIG
+// SMS GATE CONFIG
 // ===============================
-const BASE_URL = 'https://api.textbee.dev/api/v1';
+const SMS_GATE_URL = 'https://api.sms-gate.app/3rdparty/v1/messages';
+
+const SMS_GATE_AUTH = {
+  username: process.env.SMS_GATE_USERNAME,
+  password: process.env.SMS_GATE_PASSWORD
+};
 
 // ===============================
 // HELPERS
@@ -132,15 +133,15 @@ Save this API key securely. You will not be able to retrieve it again.`;
 
     // Send SMS
     const smsResponse = await axios.post(
-      `${BASE_URL}/gateway/devices/${process.env.TEXTBEE_DEVICE_ID}/send-sms`,
+      SMS_GATE_URL,
       {
-        recipients: [normalizedPhone],
-        message: smsMessage
+        textMessage: {
+          text: smsMessage
+        },
+        phoneNumbers: [normalizedPhone]
       },
       {
-        headers: {
-          'x-api-key': process.env.TEXTBEE_API_KEY
-        }
+        auth: SMS_GATE_AUTH
       }
     );
 
@@ -243,17 +244,17 @@ app.post('/send/sms', async (req, res) => {
     // Append watermark
     const finalMessage = `${message}\n\nSent via SMS API Philippines`;
 
-    // Send SMS via TextBee
+    // Send SMS via SMS Gate
     const smsResponse = await axios.post(
-      `${BASE_URL}/gateway/devices/${process.env.TEXTBEE_DEVICE_ID}/send-sms`,
+      SMS_GATE_URL,
       {
-        recipients: [normalizedRecipient],
-        message: finalMessage
+        textMessage: {
+          text: finalMessage
+        },
+        phoneNumbers: [normalizedRecipient]
       },
       {
-        headers: {
-          'x-api-key': process.env.TEXTBEE_API_KEY
-        }
+        auth: SMS_GATE_AUTH
       }
     );
 
