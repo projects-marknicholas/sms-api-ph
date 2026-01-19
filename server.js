@@ -22,7 +22,11 @@ const db = admin.firestore();
 // EXPRESS SETUP
 // ===============================
 const app = express();
-app.use(cors());
+const corsOptions = {
+  methods: ['POST'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ===============================
