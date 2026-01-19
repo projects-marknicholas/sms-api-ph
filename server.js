@@ -161,9 +161,6 @@ Save this API key securely. You will not be able to retrieve it again.`;
     res.json({
       success: true,
       message: 'API key generated and SMS sent',
-      api_key,
-      user_id,
-      phone_number: normalizedPhone,
       firestore_id: docRef.id
     });
 
